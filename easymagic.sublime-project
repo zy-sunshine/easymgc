@@ -1,0 +1,19 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/zhangyang09/work2/fedora_sb_map"
+		}
+	],
+	"build_systems":
+    [
+        {
+        	"name": "Run Tests",
+        	"cmd": ["python", "-u", "$file"],
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"selector": "source.python",
+			"working_dir": "${project_path}",
+            "env": {"PYTHONPATH": ".:${project_path}"}
+        }
+    ]
+}
