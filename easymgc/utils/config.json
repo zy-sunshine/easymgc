@@ -1,0 +1,62 @@
+{
+    "D": {
+        "ROOT": "/home/zhangyang09/work2/easymgc"
+    },
+    "G": {
+        "fstype_map": {},
+        "win_probe_status": 0,
+        "mount_all_list": [],
+        "fstype_swap_index": -1,
+        "boot_device": null,
+        "pkgarr_probe_status": 0,
+        "pkgarr_probe_result": [],
+        "skipxsetting": 0,
+        "all_orig_part": [],
+        "path_allpa": "/tmpfs/tftpboot/allpa",
+        "pkgpos_map": {},
+        "arrangement": [],
+        "reprobe_all_disks_required": 0,
+        "all_harddisks": {},
+        "all_part_infor": {},
+        "arch_map": {},
+        "root_device": null,
+        "swap_device": null,
+        "toplevelgrp_map": {},
+        "win_probe_result": [],
+        "archsize_map": {},
+        "path_tftproot": "/tmpfs/tftpboot",
+        "choosed_patuple": []
+    },
+    "S": {
+        "had_probe_pkgarr": false,
+        "pkgarr": [],
+        "had_probe_monitor": false,
+        "monitor": [],
+        "had_probe_videocard": false,
+        "videocard": [],
+        "had_probe_mouse": false,
+        "mouse": [],
+        "all_harddisks": {}, 
+        "BASE_REPO_NAME": "",
+        "BASE_REPO_URL": ""
+    },
+    "BOOTLDR": {
+    	"bltype": "",
+    	"instpos": "",
+		"timeout": "",
+		"usepassword": "", 
+		"password": "",
+		"lba": "",
+		"options": "", 
+		"entries": [],
+		"default": "",
+		"bootdev": "", 
+		"mbr_device": "", 
+		"win_device": "",
+		"win_fs": ""
+    },
+    "ACCOUNT": {
+    	"rootpasswd": "",
+    	"acclist": []
+    }
+}

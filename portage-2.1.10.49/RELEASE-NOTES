@@ -1,0 +1,242 @@
+Release Notes; upgrade information mainly.
+Features/major bugfixes are listed in NEWS
+
+portage-2.2
+==================================
+
+* Portage now warns if an ebuild repository does not have a name, as several
+  new features in 2.2 make use of or require named repositories. The repository
+  name is stored in profiles/repo_name in each repository.
+* Package set support: There are several important notes regarding package
+  sets:
+  - they may currently only include simple and versioned atoms or other sets,
+    use conditionals or any-of constructs aren't possible yet
+  - sets can be referenced either in other file-based sets or as argument to
+    emerge, but not in ebuilds, config files or other tools at this time.
+  - packages won't be unmerged if they are referenced by an installed package
+    set (with the exception of the world set, and installed being determined
+    by the world_sets file).
+* The "selected" package set, which includes packages listed in
+  /var/lib/portage/world, has been extended to include nested sets that may
+  be listed /var/lib/portage/world_sets.
+
+portage-2.1.10.27
+==================================
+* FEATURES=fixpackages is now enabled unconditionally. Set --package-moves=n
+  in EMERGE_DEFAULT_OPTS if you need to temporarily avoid package moves for
+  some reason.
+
+portage-2.1.10
+==================================
+* The emerge --autounmask option is now enabled by default. The
+  --autounmask-write option can be used to have config changes automatically
+  written to the appropriate files (respecting --ask and CONFIG_PROTECT). If
+  --autounmask behavior is not desired as the default behavior, then it can
+  be disabled by adding --autounmask=n to the EMERGE_DEFAULT_OPTS variable in
+  make.conf. Refer to the emerge(1) man page for more information.
+
+portage-2.1.9
+==================================
+* The emerge "world" set now includes separate "selected" and "system" sets,
+  where the "selected" set includes packages listed in /var/lib/portage/world.
+* Package set names in emerge arguments have to be prefixed with @ (exceptions:
+  'world' and 'system' can be used without the prefix).
+* Configuration files now support atoms with wildcards inside the category and
+  package name parts of the atoms.
+* The functionality of the autounmask program is emulated by the new emerge
+  --autounmask option, which outputs required configuration changes for
+  package.accept_keywords and package.use.
+* The new emerge --exclude option allows packages to be excluded from the
+  dependency resolution. Doing so might result in a fatal error. See the
+  emerge(1) man page for details.
+* Per-package environment variables can be set with the new package.env
+  configuration file in /etc/portage/. See the portage(5) man page for details.
+* Support for per-package bashrc files in /etc/portage/env. See the portage(5)
+  man page for details.
+* The package.keywords configuration file in /etc/portage/ is now deprecated.
+  Instead use the package.accept_keywords file which has the same format and
+  behavior. See the portage(5) man page for details.
+* FEATURES="fixlafiles" (enabled by default): Rewrites newly installed .la
+  files in the same way dev-util/lafilefixer does. Note that this won't fix
+  your installed .la files.
+
+portage-2.1.8
+==================================
+* The new --rebuilt-binaries option will replace installed packages with binary
+  packages that have been rebuilt. Rebuilds are detected by comparison of
+  BUILD_TIME package metadata. This option is enabled automatically when using
+  binary packages (--usepkgonly or --getbinpkgonly) together with --update and
+  --deep.
+
+portage-2.1.7
+==================================
+* Default behavior for emerge commands has changed so that packages are only
+  updated when necessary. In order to ensure that all packages are updated
+  when possible, you must now specify the -u/--update option. See bug #275945
+  for the rationale behind this change.
+* If using python3, you may notice that some types of program output which
+  require a tty device (like the wget progress bar) will be disabled. This
+  is due to an upstream python issue: http://bugs.python.org/issue5380. See
+  bug #287648 for more information.
+* Licenses in the @EULA license group are now masked by the default
+  ACCEPT_LICENSE setting. You can unmask all licenses by setting
+  ACCEPT_LICENSE="*" in /etc/make.conf. See the make.conf(5) man page for
+  more information about ACCEPT_LICENSE.
+
+portage-2.1.6.12
+==================================
+* If you want overlay eclasses to override eclasses from other repos then see
+  the portage(5) man page for information about the new layout.conf and
+  repos.conf configuration files.
+
+portage-2.1.6
+==================================
+
+* The default behavior has changed for `emerge world` and `emerge system`
+  commands. These commands will reinstall all packages from the given set
+  unless an option such as --noreplace, --update, or --newuse is specified.
+* FEATURES=fixpackages is now enabled by default via make.globals. Set
+  FEATURES="-fixpackages" in make.conf if you'd like to disable it.
+* File collision protection is now enabled by default via make.globals with
+  FEATURES=protect-owned. In order to protect files from be overwritten or
+  removed a inappropriate times, it is recommended to leave protect-owned
+  (or the similar collision-protect feature) enabled at all times. If you
+  want to disable collision protection completely (not recommended), then
+  you need to ensure that neither protect-owned nor collision-protect are
+  enabled.
+* The python namespace for portage has been sanitized, all portage related code
+  is now contained within the portage namespace. External script should be
+  updated accordingly, though links exist for backward compability.
+* -* support in package.keywords was changed as it was inconsistent with 
+  ACCEPT_KEYWORDS behavior (also see
+  http://dev.gentoo.org/~genone/docs/KEYWORDS.stupid).
+  Previously having -* in package.keywords matched packages with KEYWORDS="-*",
+  now it resets the ACCEPT_KEYWORDS list for the given atom like it does when
+  used in ACCEPT_KEYWORDS.
+  For packages that don't specify any other KEYWORDS you can use the new **
+  token as documented in portage(5) to disable KEYWORDS filtering completely.
+* When generating manifests, existing distfiles digests will not be updated
+  in cases when the current file in $DISTDIR does not match. In order to
+  force digests to be updated, run `ebuild --force <ebuild file> manifest`.
+  This is a safety measure which protects valid distfiles digests from being
+  accidentally replaced by invalid digests.
+* If you have overridden FETCHCOMMAND or RESUMECOMMAND variables, for
+  compatibility with EAPI 2, you must ensure that these variables are written
+  such that the downloaded file will be placed at \"\${DISTDIR}/\${FILE}\".
+  Refer to make.conf(5) for information about FETCHCOMMAND and RESUMECOMMAND.
+
+portage-2.1.5
+==================================
+
+* The pkg_postinst phase is now called after the previous version of a
+  package has been removed. As a consequence, it is no longer possible
+  to call has_version in pkg_postinst to detect whether the current
+  install operation is an upgrade or downgrade. If this information is
+  needed during the pkg_postinst phase, do the has_version call in an
+  earlier phase (such as pkg_preinst) and store the result in a global
+  variable to be accessed by pkg_postinst when it is called. Bug #226505
+  tracks all issues related to this phase execution order change.
+* The metadata-transfer feature is now disabled by default. This disables the
+  "Updating Portage cache" routine that used to run at the tail end of each
+  `emerge --sync` operation. If you use something like the sqlite module and
+  want to keep all metadata in that format alone (useful for querying), enable
+  FEATURES="metadata-transfer" in make.conf. You should also enable
+  FEATURES="metadata-transfer" if you have any eclasses from PORTDIR_OVERLAY
+  that override eclasses from PORTDIR (in this case, you may have disabled
+  a relevant warning message by setting PORTAGE_ECLASS_WARNING_ENABLE="0" in
+  make.conf).
+* The parallel-fetch feature is now enabled by default. It is optimized
+  to avoid doing redundant checksums for previously downloaded files that have
+  the correct size. Run `tail -f /var/log/emerge-fetch.log` in a
+  terminal to view parallel-fetch progress. Add FEATURES="-parallel-fetch"
+  to /etc/make.conf if you want to disable this feature.
+
+portage-2.1.4.1
+==================================
+
+* If you have an overlay then you should remove **/files/digest-*
+  files (Manifest1) because they are no longer supported.
+* If earlier versions of portage will be used to generate manifests
+  for your overlay then you should add a file named manifest1_obsolete
+  to the root of the repository in order to disable generation of the
+  Manifest1 digest files.
+
+portage-2.1.4
+==================================
+
+* Visibility filtering is now supported for binary packages, so masking behavior
+  is essentially equivalent to that of ebuilds.
+* There is no need to have a complete portage tree available when installing binary
+  packages or uninstalling packages, but a warning message will still be displayed if
+  it appears that a valid profile is not available.
+
+portage-2.1.3
+==================================
+
+* Portage now requires >=python-2.4, but doesn't need pycrypto anymore if
+  >=python-2.5 is installed and openssl supports the rmd160 hash.
+* The "save_summary" and "echo" elog modules are now enabled by default. Setting
+  PORTAGE_ELOG_SYSTEM in make.conf will override this, so if you don't want elog
+  set PORTAGE_ELOG_SYSTEM="" in make.conf
+* The unmerge process will remove any file that is not claimed by another
+  package in the same slot and is not protected by CONFIG_PROTECT, even if the
+  modification time or checksum differs from the file that was originally
+  installed.  The old behavior is still available by adding -unmerge-orphans
+  to FEATURES.
+* The world file now supports slot atoms such as 'sys-devel/gcc:3.4'. In some
+  cases, emerge --depclean may remove slots that it would not have removed
+  in the past. The emerge --noreplace command can be used to add an atom to the
+  world file and prevent matching packages from being removed.  A slot atom
+  will be recorded in the world file for any atom that is precise enough to
+  identify a specific slot.
+* For safer operation, emerge --prune will not unmerge packages that have
+  reverse dependencies. Use --verbose to display reverse dependencies. Use
+  --nodeps to completely ignore dependencies.
+* emerge --depclean now accepts atoms and will unmerge only the specified
+  packages if nothing depends on them. Use --verbose to display reverse
+  dependencies.
+
+portage-2.1.2
+==================================
+
+* Depending on the number of packages installed, users may notice a difference
+  in the time taken for dependency calculations.  This performance penalty is
+  due to the addition of important new features which include the ability to
+  detect reverse blockers, the building of a complete dependency graph, and the
+  ability to use installed packages to satisify dependencies even after their
+  ebuilds have been removed from the portage tree.
+* emerge does not necessarily update build time dependencies that are not
+  strictly required.  See the --with-bdeps option in the emerge(1) man page.
+
+portage-2.1.1
+==================================
+
+* emerge --search doesn't use regular expressions now anymore by default, so
+  emerge --search dvd+rw-tools now works as expected. Regular expressions can be enabled
+  by prefixing the search string with %. 
+* emerge --depclean algorithm is much safer than the old one.
+* emerge --newuse detects changes in IUSE that previously went undetected.
+
+portage-2.1
+==================================
+
+* new cache framework, breaking all old cache modules.
+  If you're having problems with portage_db_cdb, this is likely the cause.
+* USE flag output ordering has changed.  The old ordering is now an option
+  by the name of --alphabetical.  Adding the option to EMERGE_DEFAULT_OPTS
+  in make.conf will restore the old behaviour permanently.
+* The deprecated --inject has been removed, use /etc/portage/profile/package.provided
+* The deprecated --upgradeonly has been removed, use /etc/portage/package.* 
+  instead.
+* 'emerge sync' has been deprecated, use 'emerge --sync' instead (same 
+  for other actions)
+* Tools that call emerge should override the EMERGE_DEFAULT_OPTS environment
+  variable or use the emerge --ignore-default-opts option.
+* rsync option handling has been redesigned, instead of RSYNC_* variables
+  use PORTAGE_RSYNC_EXTRA_OPTS from now on.
+* autouse (use.defaults) has been deprecated by specifying USE_ORDER in make.defaults
+  Users may still turn this back on by specifying USE_ORDER="env:pkg:conf:auto:defaults"
+  in make.conf.  Interested in figuring out what use flags were turned off?  Check out
+  /usr/portage/profiles/base/use.defaults and other use.defaults files that correspond 
+  to your profile.
+
